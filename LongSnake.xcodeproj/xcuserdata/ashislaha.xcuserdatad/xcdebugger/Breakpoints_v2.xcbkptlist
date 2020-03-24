@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "6A6CF39E-9D6A-422B-B6E6-E540CA402757"
+            uuid = "E1226721-60B9-46FD-B094-863EC0E16DB7"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LongSnake/GameScene.swift"
+            filePath = "LongSnake/GameManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "117"
-            endingLineNumber = "117"
-            landmarkName = "playButtonTapped()"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
+            landmarkName = "updatePlayerPosition(direction:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

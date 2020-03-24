@@ -16,11 +16,11 @@ struct Constants {
 
 class GameScene: SKScene {
 	
-	var gameManager = GameManager()
+	var gameManager: GameManager!
 	
 	private var gameBackground: SKShapeNode!
-	private var playerPositions: [(Int, Int)] = []
-	private var gameArray: [(node: SKShapeNode, x: Int, y: Int)] = []
+	public var playerPositions: [Position] = []
+	public var gameArray: [(node: SKShapeNode, row: Int, col: Int)] = []
 	
 	// add some level
 	private var gameLogo: SKLabelNode = {
@@ -70,15 +70,19 @@ class GameScene: SKScene {
 		return node
 	}()
 	
+	// MARK:- SKScene methods
 	
 	override func didMove(to view: SKView) {
+		gameManager = GameManager(scene: self)
 		initialise()
 		gameViewInitialise()
-		
+		addSwipeGesture()
 	}
 	
+	// this method is getting called when a new frame is initialised
+	// generally, most modern hardware supports 60 frames/second, so the the below method will get called 60 times per second.
 	override func update(_ currentTime: TimeInterval) {
-		// Called before each frame is rendered
+		gameManager.update(time: currentTime)
 	}
 	
 	private func initialise() {
@@ -122,6 +126,8 @@ class GameScene: SKScene {
 			
 			self.gameBackground.run(SKAction.scale(to: 1.0, duration: 0.5))
 			self.currentScore.run(SKAction.scale(to: 1.0, duration: 0.5))
+			
+			self.gameManager.startGame()
 		}
 		
 		playButton.run(SKAction.scale(to: 0.0, duration: 0.5)) {
@@ -139,7 +145,7 @@ class GameScene: SKScene {
 		let height = frame.size.height - 300
 		let rect = CGRect(x: -width / 2, y: -height / 2, width: width, height: height)
 		gameBackground = SKShapeNode(rect: rect)
-		gameBackground.fillColor = .gray
+		gameBackground.fillColor = .clear
 		gameBackground.zPosition = 2
 		gameBackground.isHidden = true
 		addChild(gameBackground)
@@ -148,21 +154,23 @@ class GameScene: SKScene {
 	}
 	private func createGameBoard(width: CGFloat, height: CGFloat) {
 		let cellWidth: CGFloat = 27.5
-		let numRows = 38
-		let numCols = 20
+		let numRows = GameStructure.rows
+		let numCols = GameStructure.cols
 		var x = CGFloat(width / -2) + (cellWidth / 2)
 		var y = CGFloat(height / 2) - (cellWidth / 2)
 		
 		//loop through rows and columns, create cells
-		for i in 0...numRows - 1 {
-			for j in 0...numCols - 1 {
+		for i in 0...numRows - 1 { // belongs to Y axis
+			for j in 0...numCols - 1 { // belongs to X axis
 				let cellNode = SKShapeNode(rectOf: CGSize(width: cellWidth, height: cellWidth))
-				cellNode.strokeColor = SKColor.black
+				cellNode.strokeColor = .yellow
 				cellNode.zPosition = 2
 				cellNode.position = CGPoint(x: x, y: y)
+				
 				//add to array of cells -- then add to game board
-				gameArray.append((node: cellNode, x: i, y: j))
+				gameArray.append((node: cellNode, row: i, col: j))
 				gameBackground.addChild(cellNode)
+				
 				//iterate x
 				x += cellWidth
 			}
@@ -170,6 +178,29 @@ class GameScene: SKScene {
 			x = CGFloat(width / -2) + (cellWidth / 2)
 			y -= cellWidth
 		}
+	}
+	
+	// MARK:- add swipe gesture
+	private func addSwipeGesture() {
+		let leftSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipe(gesture:)))
+		leftSwipeGesture.direction = .left
+		view?.addGestureRecognizer(leftSwipeGesture)
+		
+		let rightSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipe(gesture:)))
+		rightSwipeGesture.direction = .right
+		view?.addGestureRecognizer(rightSwipeGesture)
+		
+		let downSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipe(gesture:)))
+		downSwipeGesture.direction = .down
+		view?.addGestureRecognizer(downSwipeGesture)
+		
+		let upSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipe(gesture:)))
+		upSwipeGesture.direction = .up
+		view?.addGestureRecognizer(upSwipeGesture)
+	}
+	
+	@objc func swipe(gesture: UISwipeGestureRecognizer) {
+		gameManager.swipe(direction: gesture.direction)
 	}
 	
 }
