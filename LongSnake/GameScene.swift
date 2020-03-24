@@ -11,6 +11,7 @@ import GameplayKit
 
 struct Constants {
 	static let playButtonName = "play_button"
+	static let bestScore = "bestScore"
 }
 
 
@@ -21,6 +22,7 @@ class GameScene: SKScene {
 	private var gameBackground: SKShapeNode!
 	public var playerPositions: [Position] = []
 	public var gameArray: [(node: SKShapeNode, row: Int, col: Int)] = []
+	public var randomPoint: Position! 
 	
 	// add some level
 	private var gameLogo: SKLabelNode = {
@@ -36,7 +38,6 @@ class GameScene: SKScene {
 		let bestScore = SKLabelNode(fontNamed: "ArialRoundedMTBold")
 		bestScore.zPosition = 1
 		bestScore.fontColor = .green
-		bestScore.text = "Best score: "
 		bestScore.fontSize = 40
 		return bestScore
 	}()
@@ -60,13 +61,13 @@ class GameScene: SKScene {
 	}()
 	
 	// current score
-	private var currentScore: SKLabelNode = {
+	var currentScore: SKLabelNode = {
 		let node = SKLabelNode(fontNamed: "ArialRoundedMTBold")
 		node.zPosition = 1
 		node.fontSize = 40
 		node.fontColor = .green
 		node.isHidden = true
-		node.text = "Current Score: "
+		node.text = "Current Score: 0"
 		return node
 	}()
 	
@@ -86,6 +87,9 @@ class GameScene: SKScene {
 	}
 	
 	private func initialise() {
+		
+		let bestScoreValue = UserDefaults.standard.value(forKey: Constants.bestScore) as? Int ?? 0
+		bestScore.text = "Best score: \(bestScoreValue)"
 		
 		[gameLogo, bestScore, playButton].forEach { addChild($0) }
 		gameLogo.position = .zero
@@ -202,5 +206,4 @@ class GameScene: SKScene {
 	@objc func swipe(gesture: UISwipeGestureRecognizer) {
 		gameManager.swipe(direction: gesture.direction)
 	}
-	
 }
