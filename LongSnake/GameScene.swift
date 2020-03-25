@@ -206,4 +206,14 @@ class GameScene: SKScene {
 	@objc func swipe(gesture: UISwipeGestureRecognizer) {
 		gameManager.swipe(direction: gesture.direction)
 	}
+	
+	public func resetGame() {
+		playerPositions.removeAll()
+		[gameLogo, bestScore, playButton].forEach { $0.isHidden = false }
+		gameBackground.isHidden = true
+		
+		// remove the gesture
+		
+		// ask the user to restart the game
+	}
 }

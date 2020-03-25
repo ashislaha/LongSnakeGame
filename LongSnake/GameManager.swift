@@ -49,7 +49,7 @@ class GameManager {
 		bestScore = UserDefaults.standard.value(forKey: Constants.bestScore) as? Int ?? 0
 	}
 	
-	// MARK: start game
+	// MARK:- start game
 	public func startGame() {
 		
 		[(10,10), (10,11), (10,12)].forEach { scene.playerPositions.append($0) }
@@ -57,9 +57,12 @@ class GameManager {
 		generateRandomPoint()
 	}
 	
-	// MARK: update frame based on time
+	// MARK:- update frame based on time
 	
 	func update(time: Double) {
+		
+		guard !scene.playerPositions.isEmpty else { return }
+		
 		guard nextIteration != nil else {
 			nextIteration = time + nextIterationInterval
 			return
@@ -69,6 +72,7 @@ class GameManager {
 			nextIteration = time + nextIterationInterval
 			updatePlayerPosition(direction: currentDirection)
 			checkRandomPointForScore()
+			checkGameFinishPoint()
 		}
 	}
 	
@@ -126,7 +130,7 @@ class GameManager {
 		return false
 	}
 	
-	// MARK: swipe
+	// MARK:- swipe
 	public func swipe(direction: UISwipeGestureRecognizer.Direction) {
 		
 		// 1. avoid the conflict
@@ -179,7 +183,7 @@ class GameManager {
 		updatePlayerPosition(direction: currentDirection)
 	}
 	
-	// MARK: Random Point
+	// MARK:- Random Point
 	private func generateRandomPoint() {
 		var randomRow = Int(arc4random_uniform(UInt32(GameStructure.rows)))
 		var randomCol = Int(arc4random_uniform(UInt32(GameStructure.cols)))
@@ -193,6 +197,8 @@ class GameManager {
 	}
 	
 	private func checkRandomPointForScore() {
+		guard !scene.playerPositions.isEmpty else { return }
+		
 		if let randomPoint = scene.randomPoint {
 			let firstPointRow = scene.playerPositions[0].row
 			let firstPointCol = scene.playerPositions[0].col
@@ -213,6 +219,21 @@ class GameManager {
 					nextIterationInterval -= fraction/10.0
 				}
 			}
+		}
+	}
+	
+	// MARK:- check Game finish point
+	
+	private func checkGameFinishPoint() {
+		guard !scene.playerPositions.isEmpty else { return }
+		
+		// when the first point of playerPoint/snake touches it's own point then finish the game
+		var tempArray = scene.playerPositions
+		let snakeHead = tempArray[0]
+		tempArray.remove(at: 0)
+		if contains(a: tempArray, b: snakeHead) {
+			print("game is over")
+			scene.resetGame()
 		}
 	}
 }
